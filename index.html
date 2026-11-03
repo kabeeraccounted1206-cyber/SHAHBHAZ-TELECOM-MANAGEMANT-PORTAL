@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shahbaz Telecom Management</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+header {
+  background: #0f172a;
+  color: white;
+  padding: 20px;
+}
+
+header h1 {
+  font-size: 23px;
+}
+
+header p {
+  color: #cbd5e1;
+  margin-top: 5px;
+}
+
+nav {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  background: white;
+  overflow-x: auto;
+}
+
+nav button {
+  border: 0;
+  background: #e2e8f0;
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+nav button.active {
+  background: #2563eb;
+  color: white;
+}
+
+main {
+  max-width: 1100px;
+  margin: auto;
+  padding: 15px;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+h2 {
+  margin: 10px 0 16px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 2px 8px #00000008;
+}
+
+.card p {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.card h3 {
+  font-size: 24px;
+  margin-top: 10px;
+  color: #2563eb;
+  overflow-wrap: anywhere;
+}
+
+.panel {
+  background: white;
+  padding: 18px;
+  border-radius: 12px;
+  margin-bottom: 18px;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin: 6px 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  font-size: 15px;
+}
+
+label {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.btn {
+  padding: 12px 16px;
+  background: #2563eb;
+  color: white;
+  border: 0;
+  border-radius: 7px;
+  cursor: pointer;
+  margin: 4px 0;
+}
+
+.btn.red {
+  background: #dc2626;
+}
+
+.btn.green {
+  background: #059669;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 500px;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+th {
+  background: #f8fafc;
+}
+
+.small {
+  color: #64748b;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+#message {
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  display: none;
+  background: #dcfce7;
+  color: #166534;
+}
+
+@media print {
+  header, nav, main, .no-print {
+    display: none !important;
+  }
+
+  #printArea {
+    display: block !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>SHAHBAZ TELECOM</h1>
+  <p>Stock, Sale, Purchase & Invoice Management</p>
+</header>
+
+<nav>
+  <button class="active" onclick="showPage('dashboard',this)">Dashboard</button>
+  <button onclick="showPage('stock',this)">Stock</button>
+  <button onclick="showPage('sale',this)">Sale</button>
+  <button onclick="showPage('purchase',this)">Purchase</button>
+  <button onclick="showPage('transfer',this)">Transfer</button>
+  <button onclick="showPage('records',this)">Records</button>
+</nav>
+
+<main>
+
+<div id="message"></div>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="page active">
+  <h2>Shop Dashboard</h2>
+
+  <div class="cards">
+    <div class="card">
+      <p>Total Items</p>
+      <h3 id="totalItems">0</h3>
+    </div>
+
+    <div class="card">
+      <p>Total Stock Quantity</p>
+      <h3 id="totalQty">0</h3>
+    </div>
+
+    <div class="card">
+      <p>Total Stock Value</p>
+      <h3 id="stockValue">Rs 0</h3>
+    </div>
+
+    <div class="card">
+      <p>Total Sales</p>
+      <h3 id="totalSales">Rs 0</h3>
+    </div>
+
+    <div class="card">
+      <p>Estimated Profit</p>
+      <h3 id="totalProfit">Rs 0</h3>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Low Stock Items</h3>
+    <div id="lowStock"></div>
+  </div>
+</section>
+
+<!-- STOCK -->
+<section id="stock" class="page">
+  <h2>Stock Management</h2>
+
+  <div class="panel">
+    <h3>Add New Item</h3>
+
+    <form id="itemForm">
+      <label>Item Name</label>
+      <input id="itemName" required placeholder="Example: Samsung A15">
+
+      <label>Item Code / IMEI</label>
+      <input id="itemCode" placeholder="IMEI or item code">
+
+      <label>Purchase Price (Rs)</label>
+      <input id="itemCost" type="number" min="0" required>
+
+      <label>Sale Price (Rs)</label>
+      <input id="itemPrice" type="number" min="0" required>
+
+      <label>Opening Quantity</label>
+      <input id="itemQty" type="number" min="0" required>
+
+      <button class="btn" type="submit">Add Item</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h3>Available Stock</h3>
+    <input id="stockSearch" placeholder="Search item..." oninput="renderStock()">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Code</th>
+            <th>Cost</th>
+            <th>Sale Price</th>
+            <th>Quantity</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="stockTable"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- SALE -->
+<section id="sale" class="page">
+  <h2>New Sale</h2>
+
+  <div class="panel">
+    <form id="saleForm">
+      <label>Customer Name</label>
+      <input id="saleCustomer" placeholder="Customer name" required>
+
+      <label>Customer Phone</label>
+      <input id="salePhone" placeholder="03XXXXXXXXX">
+
+      <label>Select Item</label>
+      <select id="saleItem" required></select>
+
+      <label>Quantity</label>
+      <input id="saleQty" type="number" min="1" value="1" required>
+
+      <label>Sale Price Per Item (Rs)</label>
+      <input id="salePrice" type="number" min="0" required>
+
+      <button class="btn green" type="submit">Complete Sale & Create Invoice</button>
+    </form>
+  </div>
+</section>
+
+<!-- PURCHASE -->
+<section id="purchase" class="page">
+  <h2>Stock Purchase</h2>
+
+  <div class="panel">
+    <form id="purchaseForm">
+      <label>Select Item</label>
+      <select id="purchaseItem" required></select>
+
+      <label>Quantity Purchased</label>
+      <input id="purchaseQty" type="number" min="1" required>
+
+      <label>Purchase Price Per Item (Rs)</label>
+      <input id="purchaseCost" type="number" min="0" required>
+
+      <button class="btn green" type="submit">Add Purchase</button>
+    </form>
+  </div>
+</section>
+
+<!-- TRANSFER -->
+<section id="transfer" class="page">
+  <h2>Stock Transfer</h2>
+
+  <div class="panel">
+    <form id="transferForm">
+      <label>Select Item</label>
+      <select id="transferItem" required></select>
+
+      <label>Transfer Quantity</label>
+      <input id="transferQty" type="number" min="1" required>
+
+      <label>From Shop</label>
+      <input id="fromShop" value="Main Shop" required>
+
+      <label>To Shop</label>
+      <input id="toShop" placeholder="Destination shop" required>
+
+      <button class="btn" type="submit">Record Transfer</button>
+    </form>
+  </div>
+
+  <p class="small">
+    Note: This version records transfer history. It does not maintain
+    separate stock balances for different shops.
+  </p>
+</section>
+
+<!-- RECORDS -->
+<section id="records" class="page">
+  <h2>Business Records</h2>
+
+  <div class="panel">
+    <h3>Invoices & Transactions</h3>
+
+    <button class="btn" onclick="exportData()">Backup Data</button>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Details</th>
+            <th>Amount</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="recordsTable"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div id="printArea" style="display:none"></div>
+
+<script>
+const STORAGE_KEY = "shahbaz_telecom_management_v1";
+
+let data = {
+  items: [],
+  records: [],
+  nextId: 1
+};
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) data = JSON.parse(saved);
+  } catch (e) {
+    alert("Data load nahi ho saka.");
+  }
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function money(amount) {
+  return "Rs " + Number(amount || 0).toLocaleString("en-PK");
+}
+
+function showMessage(text) {
+  const box = document.getElementById("message");
+  box.textContent = text;
+  box.style.display = "block";
+
+  setTimeout(() => {
+    box.style.display = "none";
+  }, 3000);
+}
+
+function showPage(id, button) {
+  document.querySelectorAll(".page").forEach(p => {
+    p.classList.remove("active");
+  });
+
+  document.getElementById(id).classList.add("active");
+
+  document.querySelectorAll("nav button").forEach(b => {
+    b.classList.remove("active");
+  });
+
+  button.classList.add("active");
+
+  renderAll();
+}
+
+function getItem(id) {
+  return data.items.find(item => item.id === Number(id));
+}
+
+function addRecord(type, details, amount, extra = {}) {
+  const record = {
+    id: data.nextId++,
+    date: new Date().toLocaleString(),
+    type,
+    details,
+    amount: Number(amount || 0),
+    ...extra
+  };
+
+  data.records.unshift(record);
+  saveData();
+
+  return record;
+}
+
+// ADD STOCK ITEM
+document.getElementById("itemForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const name = document.getElementById("itemName").value.trim();
+  const code = document.getElementById("itemCode").value.trim();
+
+  if (code && data.items.some(i => i.code === code)) {
+    showMessage("Ye item code pehle se mojood hai.");
+    return;
+  }
+
+  const item = {
+    id: data.nextId++,
+    name,
+    code,
+    cost: Number(document.getElementById("itemCost").value),
+    price: Number(document.getElementById("itemPrice").value),
+    qty: Number(document.getElementById("itemQty").value)
+  };
+
+  data.items.push(item);
+
+  addRecord("Opening Stock", name, item.cost * item.qty);
+  saveData();
+
+  this.reset();
+  renderAll();
+  showMessage("Item successfully add ho gaya.");
+});
+
+// STOCK TABLE
+function renderStock() {
+  const search = document.getElementById("stockSearch").value.toLowerCase();
+
+  const items = data.items.filter(item =>
+    item.name.toLowerCase().includes(search) ||
+    item.code.toLowerCase().includes(search)
+  );
+
+  document.getElementById("stockTable").innerHTML = items.map(item => `
+    <tr>
+      <td>${escapeHTML(item.name)}</td>
+      <td>${escapeHTML(item.code)}</td>
+      <td>${money(item.cost)}</td>
+      <td>${money(item.price)}</td>
+      <td>${item.qty}</td>
+      <td>
+        <button class="btn red" onclick="deleteItem(${item.id})">Delete</button>
+      </td>
+    </tr>
+  `).join("");
+}
+
+function deleteItem(id) {
+  const item = getItem(id);
+
+  if (!item) return;
+
+  if (!confirm("Kya aap " + item.name + " delete karna chahte hain?")) {
+    return;
+  }
+
+  data.items = data.items.filter(i => i.id !== Number(id));
+  saveData();
+  renderAll();
+  showMessage("Item delete ho gaya.");
+}
+
+// ITEM DROPDOWNS
+function renderSelects() {
+  const options = data.items.map(item => `
+    <option value="${item.id}">
+      ${escapeHTML(item.name)} — Stock: ${item.qty}
+    </option>
+  `).join("");
+
+  ["saleItem", "purchaseItem", "transferItem"].forEach(id => {
+    const select = document.getElementById(id);
+    const previous = select.value;
+
+    select.innerHTML = options ||
+      '<option value="">Pehle stock item add karein</option>';
+
+    if (previous && getItem(previous)) select.value = previous;
+  });
+
+  const selected = getItem(document.getElementById("saleItem").value);
+
+  if (selected) {
+    document.getElementById("salePrice").value = selected.price;
+  }
+}
+
+document.getElementById("saleItem").addEventListener("change", function() {
+  const item = getItem(this.value);
+
+  if (item) {
+    document.getElementById("salePrice").value = item.price;
+  }
+});
+
+document.getElementById("purchaseItem").addEventListener("change", function() {
+  const item = getItem(this.value);
+
+  if (item) {
+    document.getElementById("purchaseCost").value = item.cost;
+  }
+});
+
+// SALE
+document.getElementById("saleForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const item = getItem(document.getElementById("saleItem").value);
+  const qty = Number(document.getElementById("saleQty").value);
+  const price = Number(document.getElementById("salePrice").value);
+
+  if (!item || qty < 1 || qty > item.qty) {
+    showMessage("Stock available nahi hai.");
+    return;
+  }
+
+  const customer = document.getElementById("saleCustomer").value.trim();
+  const phone = document.getElementById("salePhone").value.trim();
+
+  const total = qty * price;
+  const profit = qty * (price - item.cost);
+
+  item.qty -= qty;
+
+  const invoice = addRecord(
+    "Sale",
+    item.name + " x " + qty + " | " + customer,
+    total,
+    {
+      invoiceNo: "ST-" + Date.now(),
+      customer,
+      phone,
+      itemId: item.id,
+      itemName: item.name,
+      qty,
+      price,
+      cost: item.cost,
+      profit
+    }
+  );
+
+  saveData();
+  this.reset();
+  renderAll();
+
+  showMessage("Sale complete. Invoice number: " + invoice.invoiceNo);
+
+  printInvoice(invoice.id);
+});
+
+// PURCHASE
+document.getElementById("purchaseForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const item = getItem(document.getElementById("purchaseItem").value);
+  const qty = Number(document.getElementById("purchaseQty").value);
+  const cost = Number(document.getElementById("purchaseCost").value);
+
+  if (!item || qty < 1) {
+    showMessage("Purchase details check karein.");
+    return;
+  }
+
+  item.qty += qty;
+  item.cost = cost;
+
+  addRecord("Purchase", item.name + " x " + qty, qty * cost);
+
+  saveData();
+  this.reset();
+  renderAll();
+
+  showMessage("Purchase stock mein add ho gayi.");
+});
+
+// TRANSFER
+document.getElementById("transferForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const item = getItem(document.getElementById("transferItem").value);
+  const qty = Number(document.getElementById("transferQty").value);
+
+  if (!item || qty < 1 || qty > item.qty) {
+    showMessage("Transfer ke liye stock available nahi.");
+    return;
+  }
+
+  const from = document.getElementById("fromShop").value.trim();
+  const to = document.getElementById("toShop").value.trim();
+
+  if (from === to) {
+    showMessage("Dono shops alag honi chahiye.");
+    return;
+  }
+
+  item.qty -= qty;
+
+  addRecord(
+    "Transfer",
+    item.name + " x " + qty + " | " + from + " → " + to,
+    0
+  );
+
+  saveData();
+  this.reset();
+  renderAll();
+
+  showMessage("Transfer record save ho gaya.");
+});
+
+// DASHBOARD
+function renderDashboard() {
+  const totalQty = data.items.reduce((sum, i) => sum + i.qty, 0);
+
+  const stockValue = data.items.reduce(
+    (sum, i) => sum + i.qty * i.cost, 0
+  );
+
+  const sales = data.records
+    .filter(r => r.type === "Sale")
+    .reduce((sum, r) => sum + r.amount, 0);
+
+  const profit = data.records
+    .filter(r => r.type === "Sale")
+    .reduce((sum, r) => sum + (r.profit || 0), 0);
+
+  document.getElementById("totalItems").textContent = data.items.length;
+  document.getElementById("totalQty").textContent = totalQty;
+  document.getElementById("stockValue").textContent = money(stockValue);
+  document.getElementById("totalSales").textContent = money(sales);
+  document.getElementById("totalProfit").textContent = money(profit);
+
+  const low = data.items.filter(i => i.qty <= 3);
+
+  document.getElementById("lowStock").innerHTML = low.length
+    ? low.map(i => `
+      <p>${escapeHTML(i.name)} — ${i.qty} remaining</p>
+    `).join("")
+    : "<p>Low stock items nahi hain.</p>";
+}
+
+// RECORDS
+function renderRecords() {
+  document.getElementById("recordsTable").innerHTML =
+    data.records.map(r => `
+      <tr>
+        <td>${escapeHTML(r.date)}</td>
+        <td>${escapeHTML(r.type)}</td>
+        <td>${escapeHTML(r.details)}</td>
+        <td>${money(r.amount)}</td>
+        <td>
+          ${r.invoiceNo ? `
+            <button class="btn" onclick="printInvoice(${r.id})">
+              Invoice
+            </button>
+          ` : ""}
+        </td>
+      </tr>
+    `).join("");
+}
+
+// INVOICE PRINT
+function printInvoice(id) {
+  const r = data.records.find(x => x.id === Number(id));
+
+  if (!r || !r.invoiceNo) {
+    showMessage("Invoice nahi mila.");
+    return;
+  }
+
+  const area = document.getElementById("printArea");
+
+  area.innerHTML = `
+    <div style="font-family:Arial;padding:25px;color:#111">
+      <h1>SHAHBAZ TELECOM</h1>
+      <p>Sales Invoice</p>
+      <hr style="margin:15px 0">
+
+      <p><b>Invoice:</b> ${escapeHTML(r.invoiceNo)}</p>
+      <p><b>Date:</b> ${escapeHTML(r.date)}</p>
+      <p><b>Customer:</b> ${escapeHTML(r.customer)}</p>
+      <p><b>Phone:</b> ${escapeHTML(r.phone || "-")}</p>
+
+      <table style="width:100%;margin-top:20px">
+        <tr>
+          <th>Item</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Total</th>
+        </tr>
+        <tr>
+          <td>${escapeHTML(r.itemName)}</td>
+          <td>${r.qty}</td>
+          <td>${money(r.price)}</td>
+          <td>${money(r.amount)}</td>
+        </tr>
+      </table>
+
+      <h2 style="margin-top:25px">Total: ${money(r.amount)}</h2>
+
+      <p style="margin-top:40px">Thank you for shopping!</p>
+    </div>
+  `;
+
+  area.style.display = "block";
+  window.print();
+  area.style.display = "none";
+}
+
+// DATA BACKUP
+function exportData() {
+  const file = new Blob(
+    [JSON.stringify(data, null, 2)],
+    {type: "application/json"}
+  );
+
+  const url = URL.createObjectURL(file);
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = "shahbaz-telecom-backup.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+// SAFE HTML
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[char]));
+}
+
+// RENDER ALL
+function renderAll() {
+  renderDashboard();
+  renderStock();
+  renderSelects();
+  renderRecords();
+}
+
+loadData();
+renderAll();
+</script>
+
+</body>
+</html>
